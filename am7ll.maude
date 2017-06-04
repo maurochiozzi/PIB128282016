@@ -2,8 +2,6 @@ load regras .
 
 *** comandos para meta level
 
-*** TESTE GIT
-
 mod am7ll is
     protecting REGRAS .
     protecting META-LEVEL .
