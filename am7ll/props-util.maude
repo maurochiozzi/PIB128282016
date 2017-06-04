@@ -3,7 +3,7 @@ fmod PROPS-UTIL is
 
 	sort Prop .
 
-	*** Propositions
+	--- Propositions
     ops a b c d p q r s t u v : -> Prop [ctor] .
 
     --- To string commands for parsing methods
