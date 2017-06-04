@@ -1,25 +1,27 @@
-*** Sequentes
+*** Sequente
 
 load contexto .
 
 fmod SEQUENTE is
 	protecting CONTEXTO .
 
-	*** Tipo
-	sort Sequente .
-	sort SSequente . *** Conjuntos de sequentes
+	--- Sorts declarations
+	sort Sequente .  --- a sequente
+	sort SSequente . --- set of sequente
 
 	subsort Sequente < SSequente .
 
-	*** Construtor
-	op _;_ |-- _;_ : ContextoClassico ContextoLinear ContextoClassico ContextoLinear -> Sequente [ctor prec 50 format(b o r o b o r o )] .
+	--- Constructor
+	op _;_ |-- _;_ : ClassicContexto LinearContexto ClassicContexto LinearContexto -> Sequente [ctor prec 50 format(b o r o b o r o )] .
 	op proved : -> Sequente [ctor format(g d)] .
 	op error : -> Sequente [ctor format(r d)] .
 
-	*** Conjuntos de sequentes
+	--- Set of sequente operator
 	op _||_ : SSequente SSequente -> SSequente [ctor assoc prec 60 comm] .
 
-	*** Não provar 2 vezes o mesmo sequente.
+	--- Equation used to prevent prooving the sequente two times.
 	eq proved || S:Sequente = S:Sequente .
+	--- Idempotency
 	eq S:Sequente || S:Sequente = S:Sequente .
+
 endfm

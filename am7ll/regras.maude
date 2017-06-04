@@ -7,12 +7,12 @@ mod REGRAS is
 	vars C D C' D' R S W Z : Contexto .
 	vars F G H G' : Formula .
 
-	***Regra Inicial
+	--- Initial rules
 	eq [Initial1] : [C] ; {F} |-- [D, F] ; {empty} = proved .
 	eq [Initial2] : [C, F] ; {empty} |-- [D] ; {F} = proved .
 	eq [initial3] : [C] ; {F} |-- [D] ; {F} = proved .
 
-	***Negação
+	--- Negation rules
 	eq [NProp] : ~ (~ F) = F .
 	eq [NTensor] : ~ (F x G) = ((~ F) 8 (~ G)) .
 	eq [NPar] : ~ (F 8 G) = ((~ F) x (~ G)) .
@@ -25,17 +25,17 @@ mod REGRAS is
 	eq [NBang] : ~ (! F) = ? (~ F) .
 	eq [NQuestion] : ~ (? F) = ! (~ F) .
 
-	***Implicação
+	--- Implications
 	eq [Impl] : F -o G = (~ F) 8 G .
 
-	*** Multiplicativos
+	--- Multiplicatives
 	eq [TensorL] : [C'] ; {C, (F x G)} |-- [D'] ; {D} = [C'] ; {C, F, G} |-- [D'] ; {D} .
 	eq [OrMultR] : [D'] ; {D} |-- [C'] ; {F 8 G, C} = [D'] ; {D} |-- [C'] ; {F, G, C} .
 	eq [BottomR] : [C'] ; {C} |-- [D'] ; {I, D} = [C'] ; {C} |-- [D'] ; {D} .
 	eq [1L] : [C'] ; {C, 1} |-- [D'] ; {D} = [C'] ; {C} |-- [D'] ; {D} .
 	eq [1R] : [C] ; {empty} |-- [C'] ; {1} = proved .
 
-	*** Aditivos
+	--- Additives
 	eq [AndAddR] : [C'] ; {C} |-- [D'] ; {F & G, D} =
 		[C'] ; {C} |-- [D'] ; {F, D} || [C'] ; {C} |-- [D'] ; {G, D} .
 	eq [OrAddL] : [C'] ; {C, F + G} |-- [D'] ; {D} =
@@ -43,15 +43,16 @@ mod REGRAS is
 	eq [ZeroL] : [C'] ; {C, 0} |-- [D'] ; {D} = proved .
 	eq [TopR] : [C'] ; {C} |-- [D'] ; {T, D} = proved .
 
-	*** Regra de Split -> TensorR
+	--- Split rules:
+	--- Tensor right
 	rl [TensorR] : [R] ; {C, D} |-- [S] ; {F x G, W, Z} =>
 		[R] ; {C} |-- [S] ; {F, W} || [R] ; {D} |-- [S] ; {G, Z} .
 
-	*** Regra de Split -> OrMultL
+	--- Or Multiplicative Left
 	rl [OrMultL] : [R] ; {C, D, F 8 G} |-- [S] ; {W, Z} =>
 		[R] ; {C, F} |-- [S] ; {W} || [R] ; {D, G} |-- [S] ; {Z} .
 	
-	***
+	---
 	rl [OrAddR1] : [C'] ; {C} |-- [D'] ; {F + G, D} =>
 		[C'] ; {C} |-- [D'] ; {F, D} .
 	rl [OrAddR2] : [C'] ; {C} |-- [D'] ; {F + G, D} =>
@@ -61,19 +62,19 @@ mod REGRAS is
 	rl [AndAddL2] : [C'] ; {C, F & G} |-- [D'] ; {D} =>
 		[C'] ; {C, G} |-- [D'] ; {D} .
 
-	*** Storing rules
+	--- Storing rules
 	eq [storeL] : [C] ; {! G, S} |-- [C'] ; {D'} =
 				  [C, G] ; {S} |-- [C'] ; {D'} .
 	eq [storeR] : [C] ; {D} |-- [C'] ; {? G, S} =
 				  [C] ; {D} |-- [C', G] ; {S} .
 
-	*** operators ! ?
+	--- Bang and question mark rules
 	eq [Question] : [C] ; {empty} |-- [D] ; {! F} =
 			  [C] ; {empty} |-- [D] ; {F} .
 	eq [Bang] : [C] ; {? F} |-- [D] ; {empty} =
 			  [C] ; {F} |-- [D] ; {empty} .
 
-   *** Regras que podem causar loops (Devem ser implementadas a posteriori)
+   --- Copying rules
    *** rl [cpyL] : [C, F] ; {C'} |-- [D] ; {D'} => [C, F] ; {C', F} |-- [D] ; {D'} .
    *** rl [cpyR] : [C] ; [C'] |-- [D, F] ; {D'} => [C] ; [C'] |-- [D, F] ; {D', F} .
 endm

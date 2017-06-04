@@ -1,24 +1,26 @@
 load regras .
 
-*** comandos para meta level
-
-*** TESTE GIT
+--- Commands to simplify meta-level commands usage
 
 mod am7ll is
     protecting REGRAS .
     protecting META-LEVEL .
 
     *** Simplifações para os comandos de meta-level e tecnicas de parsing
+	--- Disambiguation commands for each kind of usage:
 
-    --- para equations
+    --- This one is used for meta-reduce equations
     op > <_> : SSequente -> String .
     
-    --- para regras simples
+    --- This second, used for meta-rewrites simple REGRAS, which only needs one substitution
     op >> _ <_> <_&_> : Qid SSequente Contexto Contexto -> String .
 
-    --- para regras de split
+    --- The last command, is used for rewrite complexe REGRAS, 'tensor right' and 'or multiplicative'
+    --- which they need four substitutions
     op >>> _ <_> <_&_&_&_> : Qid SSequente Contexto Contexto Contexto Contexto -> String .
     
+    --- These commands are implemented here. They are basically a simply command, with no verbose sintaxe,
+    --- to do all the meta-level operation with replacements
     eq > < sequente:SSequente > =
         ParseSequente(downTerm(getTerm(metaReduce(upModule('am7ll, false), upTerm(sequente:SSequente))), error)) .
 
@@ -33,46 +35,46 @@ mod am7ll is
         'W:Contexto <- upTerm(w:Contexto) ; 'Z:Contexto <- upTerm(z:Contexto),
         0, unbounded, 0)), error)) .
 
-    --- Metodos de parse do sequente
-    op Principal(_)     : Contexto -> String .
-    op Secundarios(_)   : Contexto -> String .
+    --- Parsing methods used to split between the main operator and the rest
+    op Main(_) : Contexto -> String .
+    op Rest(_) : Contexto -> String .
     op ParseSequente(_) : SSequente -> String .
 
-    --- Casos base
-    eq Principal(p:Prop)    = toString(p:Prop) .
-    eq Secundarios(p:Prop)  = toString(p:Prop) .
+    --- Base case
+    eq Main(p:Prop) = toString(p:Prop) .
+    eq Rest(p:Prop) = toString(p:Prop) .
 
-    --- Para lista de contextos/sequentes
-    eq Principal( (C:Contexto, C':Contexto) )   = Principal(C:Contexto) + ", " + Principal(C':Contexto) [owise] .
-    eq Secundarios( (C:Contexto, C':Contexto) ) = Secundarios(C:Contexto) + ", " + Secundarios(C':Contexto) [owise] .
+    --- Case of receiving a set of context or sequente. This one must be called on the last situation (other wise)
+    eq Main( (C:Contexto, C':Contexto) ) = Main(C:Contexto) + ", " + Main(C':Contexto) [owise] .
+    eq Rest( (C:Contexto, C':Contexto) ) = Rest(C:Contexto) + ", " + Rest(C':Contexto) [owise] .
     eq ParseSequente((S1:Sequente || S2:Sequente)) = ParseSequente(S1:Sequente) + " || " + ParseSequente(S2:Sequente) [owise] .
 
-    --- Para contextos/sequentes vazios
-    eq Principal(   empty )     = "" .
-    eq Secundarios( empty )     = "" .
+    --- Case of empty context
+    eq Main(empty) = "" .
+    eq Rest(empty) = "" .
 
-    --- Casos gerais
-    eq Principal((F:Formula 8 G:Formula) )  = "PAR # ("      + Secundarios(F:Formula) + ") # ("  + Secundarios(G:Formula) + ")" .
-    eq Principal((F:Formula + G:Formula) )  = "PLUS # ("     + Secundarios(F:Formula) + ") # ("  + Secundarios(G:Formula) + ")" .
-    eq Principal((F:Formula & G:Formula) )  = "WITH # ("     + Secundarios(F:Formula) + ") # ("  + Secundarios(G:Formula) + ")" .
-    eq Principal((F:Formula x G:Formula) )  = "TENSOR # ("   + Secundarios(F:Formula) + ") # ("  + Secundarios(G:Formula) + ")" .
-    eq Principal((F:Formula -o G:Formula))  = "LPOP # ("     + Secundarios(F:Formula) + ") # ("  + Secundarios(G:Formula) + ")" .
-    eq Principal( ! F:Formula )             = "BANG # ("    + Secundarios(F:Formula) + ")" .
-    eq Principal( ? F:Formula )             = "QMARK # ("   + Secundarios(F:Formula) + ")" .
-    eq Principal( ~ F:Formula )             = "NOT # ("     + Secundarios(F:Formula) + ")" .
+    --- Other cases
+    eq Main((F:Formula 8 G:Formula) ) = "PAR # ("    + Rest(F:Formula) + ") # ("  + Rest(G:Formula) + ")" .
+    eq Main((F:Formula + G:Formula) ) = "PLUS # ("   + Rest(F:Formula) + ") # ("  + Rest(G:Formula) + ")" .
+    eq Main((F:Formula & G:Formula) ) = "WITH # ("   + Rest(F:Formula) + ") # ("  + Rest(G:Formula) + ")" .
+    eq Main((F:Formula x G:Formula) ) = "TENSOR # (" + Rest(F:Formula) + ") # ("  + Rest(G:Formula) + ")" .
+    eq Main((F:Formula -o G:Formula)) = "LPOP # ("   + Rest(F:Formula) + ") # ("  + Rest(G:Formula) + ")" .
+    eq Main( ! F:Formula )            = "BANG # ("   + Rest(F:Formula) + ")" .
+    eq Main( ? F:Formula )            = "QMARK # ("  + Rest(F:Formula) + ")" .
+    eq Main( ~ F:Formula )            = "NOT # ("    + Rest(F:Formula) + ")" .
 
-    eq Secundarios((F:Formula 8 G:Formula) )= "("      + Secundarios(F:Formula) + ") 8 ("  + Secundarios(G:Formula) + ")" .
-    eq Secundarios((F:Formula + G:Formula) )= "("      + Secundarios(F:Formula) + ") + ("  + Secundarios(G:Formula) + ")" .
-    eq Secundarios((F:Formula & G:Formula) )= "("      + Secundarios(F:Formula) + ") & ("  + Secundarios(G:Formula) + ")" .
-    eq Secundarios((F:Formula x G:Formula) )= "("      + Secundarios(F:Formula) + ") x ("  + Secundarios(G:Formula) + ")" .
-    eq Secundarios((F:Formula -o G:Formula))= "("      + Secundarios(F:Formula) + ") -o ("  + Secundarios(G:Formula) + ")" .
-    eq Secundarios( ! F:Formula )           = "!("      + Secundarios(F:Formula) + ")" .
-    eq Secundarios( ? F:Formula )           = "?("      + Secundarios(F:Formula) + ")" .
-    eq Secundarios( ~ F:Formula )           = "~("      + Secundarios(F:Formula) + ")" .
+    eq Rest((F:Formula 8 G:Formula) ) = "("          + Rest(F:Formula) + ") 8 ("  + Rest(G:Formula) + ")" .
+    eq Rest((F:Formula + G:Formula) ) = "("          + Rest(F:Formula) + ") + ("  + Rest(G:Formula) + ")" .
+    eq Rest((F:Formula & G:Formula) ) = "("          + Rest(F:Formula) + ") & ("  + Rest(G:Formula) + ")" .
+    eq Rest((F:Formula x G:Formula) ) = "("          + Rest(F:Formula) + ") x ("  + Rest(G:Formula) + ")" .
+    eq Rest((F:Formula -o G:Formula)) = "("          + Rest(F:Formula) + ") -o (" + Rest(G:Formula) + ")" .
+    eq Rest( ! F:Formula )            = "!("         + Rest(F:Formula) + ")" .
+    eq Rest( ? F:Formula )            = "?("         + Rest(F:Formula) + ")" .
+    eq Rest( ~ F:Formula )            = "~("         + Rest(F:Formula) + ")" .
     
     eq ParseSequente( [C:Contexto] ; {D:Contexto} |-- [C':Contexto] ; {D':Contexto} ) =
-        "[" + Principal(C:Contexto)  + "] ; {" + Principal(D:Contexto)  + "} |-- ["
-            + Principal(C':Contexto) + "] ; {" + Principal(D':Contexto) + "}" .
+        "[" + Main(C:Contexto)  + "] ; {" + Main(D:Contexto)  + "} |-- ["
+            + Main(C':Contexto) + "] ; {" + Main(D':Contexto) + "}" .
 
 endm
 
@@ -106,21 +108,21 @@ red >>> 'TensorR < [t] ; {p, (q 8 p)} |-- [u] ; {t x (a + ! (b x p)), b, ~ c} > 
 
 red > < [empty] ; {p} |-- [empty] ; {p + q} > .
 
-eq Principal((F:Formula 8 G:Formula) )  = "PAR #( "      + Secundarios(F:Formula) + " 8 "  + Secundarios(G:Formula) + ")" .
-eq Principal((F:Formula + G:Formula) )  = "PLUS #( "     + Secundarios(F:Formula) + " + "  + Secundarios(G:Formula) + ")" .
-eq Principal((F:Formula & G:Formula) )  = "WITH #( "     + Secundarios(F:Formula) + " & "  + Secundarios(G:Formula) + ")" .
-eq Principal((F:Formula x G:Formula) )  = "TENSOR #( "   + Secundarios(F:Formula) + " x "  + Secundarios(G:Formula) + ")" .
-eq Principal((F:Formula -o G:Formula))  = "LPOP #( "     + Secundarios(F:Formula) + " -o " + Secundarios(G:Formula) + ")" .
-eq Principal( ! F:Formula )             = "BANG #(! "    + Secundarios(F:Formula) + ")" .
-eq Principal( ? F:Formula )             = "QMARK #(? "   + Secundarios(F:Formula) + ")" .
-eq Principal( ~ F:Formula )             = "NOT #(~ "     + Secundarios(F:Formula) + ")" .
+eq Main((F:Formula 8 G:Formula) )  = "PAR #( "      + Rest(F:Formula) + " 8 "  + Rest(G:Formula) + ")" .
+eq Main((F:Formula + G:Formula) )  = "PLUS #( "     + Rest(F:Formula) + " + "  + Rest(G:Formula) + ")" .
+eq Main((F:Formula & G:Formula) )  = "WITH #( "     + Rest(F:Formula) + " & "  + Rest(G:Formula) + ")" .
+eq Main((F:Formula x G:Formula) )  = "TENSOR #( "   + Rest(F:Formula) + " x "  + Rest(G:Formula) + ")" .
+eq Main((F:Formula -o G:Formula))  = "LPOP #( "     + Rest(F:Formula) + " -o " + Rest(G:Formula) + ")" .
+eq Main( ! F:Formula )             = "BANG #(! "    + Rest(F:Formula) + ")" .
+eq Main( ? F:Formula )             = "QMARK #(? "   + Rest(F:Formula) + ")" .
+eq Main( ~ F:Formula )             = "NOT #(~ "     + Rest(F:Formula) + ")" .
 
-eq Secundarios((F:Formula 8 G:Formula) )= "#( "          + Secundarios(F:Formula) + " 8 "  + Secundarios(G:Formula) + ")" .
-eq Secundarios((F:Formula + G:Formula) )= "#( "          + Secundarios(F:Formula) + " + "  + Secundarios(G:Formula) + ")" .
-eq Secundarios((F:Formula & G:Formula) )= "#( "          + Secundarios(F:Formula) + " & "  + Secundarios(G:Formula) + ")" .
-eq Secundarios((F:Formula x G:Formula) )= "#( "          + Secundarios(F:Formula) + " x "  + Secundarios(G:Formula) + ")" .
-eq Secundarios((F:Formula -o G:Formula))= "#( "          + Secundarios(F:Formula) + " -o " + Secundarios(G:Formula) + ")" .
-eq Secundarios( ! F:Formula )           = "#! "         + Secundarios(F:Formula) + ")" .
-eq Secundarios( ? F:Formula )           = "#(? "         + Secundarios(F:Formula) + ")" .
-eq Secundarios( ~ F:Formula )           = "#(~ "         + Secundarios(F:Formula) + ")" .
+eq Rest((F:Formula 8 G:Formula) )= "#( "          + Rest(F:Formula) + " 8 "  + Rest(G:Formula) + ")" .
+eq Rest((F:Formula + G:Formula) )= "#( "          + Rest(F:Formula) + " + "  + Rest(G:Formula) + ")" .
+eq Rest((F:Formula & G:Formula) )= "#( "          + Rest(F:Formula) + " & "  + Rest(G:Formula) + ")" .
+eq Rest((F:Formula x G:Formula) )= "#( "          + Rest(F:Formula) + " x "  + Rest(G:Formula) + ")" .
+eq Rest((F:Formula -o G:Formula))= "#( "          + Rest(F:Formula) + " -o " + Rest(G:Formula) + ")" .
+eq Rest( ! F:Formula )           = "#! "         + Rest(F:Formula) + ")" .
+eq Rest( ? F:Formula )           = "#(? "         + Rest(F:Formula) + ")" .
+eq Rest( ~ F:Formula )           = "#(~ "         + Rest(F:Formula) + ")" .
     
