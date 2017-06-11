@@ -63,18 +63,18 @@ mod REGRAS is
 		[C'] ; {C, G} |-- [D'] ; {D} .
 
 	--- Storing rules
-	eq [storeL] : [C] ; {! G, S} |-- [C'] ; {D'} =
-				  [C, G] ; {S} |-- [C'] ; {D'} .
-	eq [storeR] : [C] ; {D} |-- [C'] ; {? G, S} =
-				  [C] ; {D} |-- [C', G] ; {S} .
+	rl [storeL] : [C] ; {! F, S} |-- [C'] ; {D'} =>
+				  [C, F] ; {S} |-- [C'] ; {D'} .
+	rl [storeR] : [C] ; {D} |-- [C'] ; {? F, S} =>
+				  [C] ; {D} |-- [C', F] ; {S} .
 
 	--- Bang and question mark rules
-	eq [Question] : [C] ; {empty} |-- [D] ; {! F} =
+	rl [Question] : [C] ; {empty} |-- [D] ; {! F} =>
 			  [C] ; {empty} |-- [D] ; {F} .
-	eq [Bang] : [C] ; {? F} |-- [D] ; {empty} =
+	rl [Bang] : [C] ; {? F} |-- [D] ; {empty} =>
 			  [C] ; {F} |-- [D] ; {empty} .
 
-   --- Copying rules
-   *** rl [cpyL] : [C, F] ; {C'} |-- [D] ; {D'} => [C, F] ; {C', F} |-- [D] ; {D'} .
-   *** rl [cpyR] : [C] ; [C'] |-- [D, F] ; {D'} => [C] ; [C'] |-- [D, F] ; {D', F} .
+	--- Copying rules
+	rl [cpyL] : [C, F] ; {C'} |-- [D] ; {D'} => [C, F] ; {C', F} |-- [D] ; {D'} .
+	rl [cpyR] : [C] ; {C'} |-- [D, F] ; {D'} => [C] ; {C'} |-- [D, F] ; {D', F} .
 endm

@@ -14,6 +14,10 @@ mod am7ll is
     --- This second, used for meta-rewrites simple REGRAS, which only needs one substitution
     op >> _ <_> <_;_> : Qid SSequente Contexto Contexto -> String .
 
+    --- A little similar from the last one, but this one dont take two parameters. Its used
+    --- to meta reduce bang, question mark and copyng rules, which only need one parameters
+    op >- _ <_> <_> : Qid SSequente Contexto -> String .
+
     --- The last command, is used for rewrite complexe REGRAS, 'tensor right' and 'or multiplicative'
     --- which they need four substitutions
     op >>> _ <_> <_;_;_;_> : Qid SSequente Contexto Contexto Contexto Contexto -> String .
@@ -26,6 +30,11 @@ mod am7ll is
     eq >> regra:Qid < sequente:SSequente > < f:Contexto ; g:Contexto > =
         ParseSequente(downTerm( getTerm( metaXapply( upModule( 'am7ll, false), upTerm(sequente:SSequente), 
         regra:Qid, 'F:Formula <- upTerm(f:Contexto) ; 'G:Formula <- upTerm(g:Contexto),
+        0, unbounded, 0)), error)) .
+
+    eq >- regra:Qid < sequente:SSequente > < f:Contexto > =
+    	ParseSequente(downTerm( getTerm( metaXapply( upModule( 'am7ll, false), upTerm(sequente:SSequente), 
+        regra:Qid, 'F:Formula <- upTerm(f:Contexto),
         0, unbounded, 0)), error)) .
 
     eq >>> regra:Qid < sequente:SSequente > < c:Contexto ; d:Contexto ; w:Contexto ; z:Contexto > =
@@ -62,6 +71,12 @@ mod am7ll is
     eq Main( ? F:Formula )            = "QMARK # ("  + Rest(F:Formula) + ")" .
     eq Main( ~ F:Formula )            = "NOT # ("    + Rest(F:Formula) + ")" .
 
+    eq Main(T)						  = "BOT" .
+    eq Main(I)						  = "TOP" .
+    eq Main(1)						  = "ONE" .
+    eq Main(0)						  = "ZERO" .
+
+
     eq Rest((F:Formula 8 G:Formula) ) = "("          + Rest(F:Formula) + ") 8 ("  + Rest(G:Formula) + ")" .
     eq Rest((F:Formula + G:Formula) ) = "("          + Rest(F:Formula) + ") + ("  + Rest(G:Formula) + ")" .
     eq Rest((F:Formula & G:Formula) ) = "("          + Rest(F:Formula) + ") & ("  + Rest(G:Formula) + ")" .
@@ -70,6 +85,11 @@ mod am7ll is
     eq Rest( ! F:Formula )            = "!("         + Rest(F:Formula) + ")" .
     eq Rest( ? F:Formula )            = "?("         + Rest(F:Formula) + ")" .
     eq Rest( ~ F:Formula )            = "~("         + Rest(F:Formula) + ")" .
+
+    eq Rest(T)						  = "BOT" .
+    eq Rest(I)						  = "TOP" .
+    eq Rest(1)						  = "ONE" .
+    eq Rest(0)						  = "ZERO" .
     
     eq ParseSequente( [C:Contexto] ; {D:Contexto} |-- [C':Contexto] ; {D':Contexto} ) =
         "[" + Main(C:Contexto)  + "] ; {" + Main(D:Contexto)  + "} |-- ["
@@ -79,48 +99,28 @@ endm
 
 eof
 
-red > < [p] ; {! p} |-- [empty] ; {(((a 8 b) + c) + (q 8 p)) 8 (p + (q 8 r))} > .
-
-Exemplos
-
 red > < [p] ; {! p} |-- [q] ; {r} > . 
 red > < [p] ; {p + q} |-- [q] ; {a + t} > . 
+red > < [empty] ; {p} |-- [empty] ; {p + q} > .
+red > < [t] ; {p, q} |-- [u] ; {t x a, b, c} > .
+red > < [p] ; {! p} |-- [empty] ; {(((a 8 b) + c) + (q 8 p)) 8 (p + (q 8 r))} > .
 
 red >> 'OrAddR2 < [p] ; {q} |-- [r] ; {s + t, u + t} > < s ; t > .
-
 red >> 'AndAddL1 < [empty] ; {q, r ; s, t + u, r ; q} |-- [empty] ; {a} > < r ; q > .
 red >> 'AndAddL1 < [empty] ; {q, r ; s, t + u, r ; s} |-- [empty] ; {a} > < r ; s > .
 red >> 'AndAddL2 < [empty] ; {q, r ; s, t + u, r ; s} |-- [empty] ; {a} > < r ; s > .
+
+red >- 'cpyL < [p, q] ; {p, r} |-- [t] ; {u} > < q > .
+red >- 'cpyL < [p, q] ; {p, r} |-- [t] ; {u} > < p > .
+red >- 'cpyR < [p, q] ; {p, r} |-- [t] ; {u} > < t > .
+red >- 'Bang < [p] ; {? a} |-- [r] ; {empty} > < a > .
+red >- 'cpyR < [p, q] ; {p, r} |-- [t] ; {u, t} > < t > .
+red >- 'Question < [p] ; {empty} |-- [r] ; { ! a} > < a > .
+red >- 'storeL < [p] ; {! a, q} |-- [r] ; {empty} > < a > .
+red >- 'storeR < [p] ; {! a, q} |-- [r, t] ; {? q , ? r} > < r > .
 
 red >>> 'TensorR < [t] ; {p, q} |-- [u] ; {t x a, b, c} > < p ; q ; c ; b > .
 red >>> 'TensorR < [t] ; {p, q} |-- [u] ; {t x a, b, c} > < p ; q ; b ; c > .
 red >>> 'TensorR < [t] ; {p, q} |-- [u] ; {t x a, b, c} > < q ; p ; c ; b > .
 red >>> 'TensorR < [t] ; {p, q} |-- [u] ; {t x a, (b + t), ( c + b)} > < q ; p ; (b + t) ; (c + b) > .
-
-
-red > < [t] ; {p, q} |-- [u] ; {t x a, b, c} > .
-
-
-
-red >>> 'TensorR < [t] ; {p, (q 8 p)} |-- [u] ; {t x (a + ! (b x p)), b, ~ c} > < (q 8 p) ; p ; b ; ~ c > .
-
-red > < [empty] ; {p} |-- [empty] ; {p + q} > .
-
-eq Main((F:Formula 8 G:Formula) )  = "PAR #( "      + Rest(F:Formula) + " 8 "  + Rest(G:Formula) + ")" .
-eq Main((F:Formula + G:Formula) )  = "PLUS #( "     + Rest(F:Formula) + " + "  + Rest(G:Formula) + ")" .
-eq Main((F:Formula ; G:Formula) )  = "WITH #( "     + Rest(F:Formula) + " ; "  + Rest(G:Formula) + ")" .
-eq Main((F:Formula x G:Formula) )  = "TENSOR #( "   + Rest(F:Formula) + " x "  + Rest(G:Formula) + ")" .
-eq Main((F:Formula -o G:Formula))  = "LPOP #( "     + Rest(F:Formula) + " -o " + Rest(G:Formula) + ")" .
-eq Main( ! F:Formula )             = "BANG #(! "    + Rest(F:Formula) + ")" .
-eq Main( ? F:Formula )             = "QMARK #(? "   + Rest(F:Formula) + ")" .
-eq Main( ~ F:Formula )             = "NOT #(~ "     + Rest(F:Formula) + ")" .
-
-eq Rest((F:Formula 8 G:Formula) )= "#( "          + Rest(F:Formula) + " 8 "  + Rest(G:Formula) + ")" .
-eq Rest((F:Formula + G:Formula) )= "#( "          + Rest(F:Formula) + " + "  + Rest(G:Formula) + ")" .
-eq Rest((F:Formula ; G:Formula) )= "#( "          + Rest(F:Formula) + " ; "  + Rest(G:Formula) + ")" .
-eq Rest((F:Formula x G:Formula) )= "#( "          + Rest(F:Formula) + " x "  + Rest(G:Formula) + ")" .
-eq Rest((F:Formula -o G:Formula))= "#( "          + Rest(F:Formula) + " -o " + Rest(G:Formula) + ")" .
-eq Rest( ! F:Formula )           = "#! "         + Rest(F:Formula) + ")" .
-eq Rest( ? F:Formula )           = "#(? "         + Rest(F:Formula) + ")" .
-eq Rest( ~ F:Formula )           = "#(~ "         + Rest(F:Formula) + ")" .
-    
+red >>> 'TensorR < [t] ; {p, (q 8 p)} |-- [u] ; {t x (a + ! (b x p)), b, ~ c} > < (q 8 p) ; p ; b ; ~ c > . 
