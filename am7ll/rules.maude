@@ -1,6 +1,6 @@
 load sequente .
 
-mod REGRAS is
+mod RULES is
 	protecting SEQUENTE .
 	protecting NAT .
 
@@ -63,15 +63,15 @@ mod REGRAS is
 		[C'] ; {C, G} |-- [D'] ; {D} .
 
 	--- Storing rules
-	rl [storeL] : [C] ; {! F, S} |-- [C'] ; {D'} =>
+	eq [storeL] : [C] ; {! F, S} |-- [C'] ; {D'} =
 				  [C, F] ; {S} |-- [C'] ; {D'} .
-	rl [storeR] : [C] ; {D} |-- [C'] ; {? F, S} =>
+	eq [storeR] : [C] ; {D} |-- [C'] ; {? F, S} =
 				  [C] ; {D} |-- [C', F] ; {S} .
 
 	--- Bang and question mark rules
-	rl [Question] : [C] ; {empty} |-- [D] ; {! F} =>
+	rl [BangDer] : [C] ; {empty} |-- [D] ; {! F} =>
 			  [C] ; {empty} |-- [D] ; {F} .
-	rl [Bang] : [C] ; {? F} |-- [D] ; {empty} =>
+	rl [QuestDer] : [C] ; {? F} |-- [D] ; {empty} =>
 			  [C] ; {F} |-- [D] ; {empty} .
 
 	--- Copying rules
