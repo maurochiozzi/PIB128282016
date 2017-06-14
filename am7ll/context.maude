@@ -1,0 +1,24 @@
+load formula .
+
+fmod CONTEXTO is
+    protecting FORMULA .
+
+    sorts Contexto ClassicContexto LinearContexto .
+    
+    op empty : -> Contexto [ctor] .
+
+    --- Every formula is a set of context
+    subsort Formula < Contexto .
+
+    --- Set of context
+    op _,_ : Contexto Contexto -> Contexto [ctor assoc comm prec 40 id: empty] .
+
+    op {_} : Contexto -> LinearContexto [ctor] .
+    op [_] : Contexto -> ClassicContexto [ctor] .
+
+    --- Idempotency applies only to the classic context
+    eq [ F:Formula, F:Formula ] = [F:Formula] .
+    eq [ F:Formula, F:Formula, T:Contexto ] = [F:Formula, T:Contexto] .
+
+ 
+endfm

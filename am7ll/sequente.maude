@@ -1,6 +1,6 @@
 *** Sequente
 
-load contexto .
+load context .
 
 fmod SEQUENTE is
 	protecting CONTEXTO .

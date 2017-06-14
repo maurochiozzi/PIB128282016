@@ -4,11 +4,11 @@ load props-util .
 
 fmod FORMULA is
     protecting PROPS-UTIL .
-    
+
     sort Formula .
 
     --- Every proposition is an formula
-    subsort Prop < Formula .
+    subsort Props < Formula .
 
     --- Defining operators
     --- Tensor
