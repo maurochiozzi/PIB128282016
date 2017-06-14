@@ -1,13 +1,4 @@
 fmod PROPS-UTIL is
-    protecting QID .
-
-    ops a b c d p q r s t u v : -> Qid [ctor] .
-endfm
-
-eof
-
-
-fmod PROPS-UTIL is
     protecting STRING .
 
     sort Props .

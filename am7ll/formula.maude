@@ -8,9 +8,7 @@ fmod FORMULA is
     sort Formula .
 
     --- Every proposition is an formula
-    --- subsort Props < Formula .
-    subsort Qid < Formula .
-
+    subsort Props < Formula .
 
     --- Defining operators
     --- Tensor
