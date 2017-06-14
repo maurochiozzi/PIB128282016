@@ -1,9 +1,18 @@
 fmod PROPS-UTIL is
-	protecting STRING .
+    protecting QID .
 
-	sort Props .
+    ops a b c d p q r s t u v : -> Qid [ctor] .
+endfm
 
-	--- Propositions
+eof
+
+
+fmod PROPS-UTIL is
+    protecting STRING .
+
+    sort Props .
+
+    --- Propositions
     ops a b c d p q r s t u v : -> Props [ctor] .
 
     --- To string commands for parsing methods
@@ -22,8 +31,3 @@ fmod PROPS-UTIL is
     eq toString(u) = "u" .
     eq toString(v) = "v" .
 endfm
-
-eof
-
-
-    

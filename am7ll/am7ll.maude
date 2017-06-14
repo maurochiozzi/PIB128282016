@@ -3,7 +3,7 @@ load parse-util .
 --- Commands to simplify meta-level commands usage
 
 mod am7ll is
-    protecting META-LEVEL .
+    protecting META-LEVEL * (op _+_ to _++_, op _,_ to _._, op [_] to :_:, op empty to null ) .
     protecting PARSE-UTIL .
 
 	--- Disambiguation commands for each kind of usage:

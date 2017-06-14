@@ -9,8 +9,8 @@ mod PARSE-UTIL is
     op ParseSequente(_) : SSequente -> String .
 
     --- Basis case
-    eq Main(p:Props) = toString(p:Props) .
-    eq Rest(p:Props) = toString(p:Props) .
+    eq Main(p:Qid) = string(p:Qid) .
+    eq Rest(p:Qid) = string(p:Qid) .
 
     --- Case of receiving a set of context or sequente. This one must be called on the last situation (other wise)
     eq Main( (C:Contexto, C':Contexto) ) = Main(C:Contexto) + ", " + Main(C':Contexto) [owise] .
