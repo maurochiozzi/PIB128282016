@@ -47,16 +47,21 @@ endm
 
 eof
 
+Examples
+
 red > < [p] ; {! p} |-- [q] ; {r} > . 
+red > < [atom(1)] ; {! p} |-- [q] ; {r} > .
 red > < [p] ; {p + q} |-- [q] ; {a + t} > . 
 red > < [empty] ; {p} |-- [empty] ; {p + q} > .
 red > < [t] ; {p, q} |-- [u] ; {t x a, b, c} > .
 red > < [p] ; {! p} |-- [empty] ; {(((a 8 b) + c) + (q 8 p)) 8 (p + (q 8 r))} > .
 
 red >> 'OrAddR2 < [p] ; {q} |-- [r] ; {s + t, u + t} > < s ; t > .
+
 red >> 'AndAddL1 < [empty] ; {q, r ; s, t + u, r ; q} |-- [empty] ; {a} > < r ; q > .
 red >> 'AndAddL1 < [empty] ; {q, r ; s, t + u, r ; s} |-- [empty] ; {a} > < r ; s > .
 red >> 'AndAddL2 < [empty] ; {q, r ; s, t + u, r ; s} |-- [empty] ; {a} > < r ; s > .
+red >> 'OrAddR1 < [p, q] ; {empty} |-- [r] ; {q, (~(p)) + (~(q))} > < (~(p)) ; (~(q))>
 
 red >- 'cpyL < [p, q] ; {p, r} |-- [t] ; {u} > < q > .
 red >- 'cpyL < [p, q] ; {p, r} |-- [t] ; {u} > < p > .

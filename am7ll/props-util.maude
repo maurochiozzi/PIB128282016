@@ -1,15 +1,25 @@
 fmod PROPS-UTIL is
     protecting STRING .
+    protecting NAT .
+    protecting CONVERSION .
 
     sort Props .
 
-    --- Propositions
+    --- Propositions constants
     ops a b c d p q r s t u v : -> Props [ctor] .
 
-    --- To string commands for parsing methods
-    
+    --- When the list of propositions constants is not enough for writing the rule.
+    --- To infinity and beyond! 
+    op atom(_) : Nat -> Props .
+
+    --- To string command for parsing methods used on meta-level (am7ll.maude) commands
     op toString(_) : Props -> String .
 
+    --- string : Rat NzNat converts the number from base 10 to the NzNat base,
+    --- as string/char output
+    eq toString(atom(n:Nat)) = "atom(" + string(n:Nat, 10) + ")" .
+
+    --- Manual parsing for propositions
     eq toString(a) = "a" .
     eq toString(b) = "b" .
     eq toString(c) = "c" .
