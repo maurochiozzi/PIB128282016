@@ -66,9 +66,9 @@ red >> 'OrAddR1 < [p, q] ; {empty} |-- [r] ; {q, (~(p)) + (~(q))} > < (~(p)) ; (
 red >- 'cpyL < [p, q] ; {p, r} |-- [t] ; {u} > < q > .
 red >- 'cpyL < [p, q] ; {p, r} |-- [t] ; {u} > < p > .
 red >- 'cpyR < [p, q] ; {p, r} |-- [t] ; {u} > < t > .
-red >- 'Bang < [p] ; {? a} |-- [r] ; {empty} > < a > .
 red >- 'cpyR < [p, q] ; {p, r} |-- [t] ; {u, t} > < t > .
-red >- 'Question < [p] ; {empty} |-- [r] ; { ! a} > < a > .
+red >- 'QuestDer < [p] ; {? a} |-- [r] ; {empty} > < a > .
+red >- 'BangDer < [p] ; {empty} |-- [r] ; { ! a} > < a > .
 red >- 'storeL < [p] ; {! a, q} |-- [r] ; {empty} > < a > .
 red >- 'storeR < [p] ; {! a, q} |-- [r, t] ; {? q , ? r} > < r > .
 
